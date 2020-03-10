@@ -20,7 +20,7 @@ import startCase from "lodash.startcase";
 import { capitalize } from "lodash";
 
 const timing: "Month" | "Week" | "Day" = "Month";
-const amount: number = 6;
+const amount: number = 1;
 
 const fileDate: string = new Date().toLocaleDateString();
 const pubAfter: string = getLast(timing, amount);
@@ -193,4 +193,4 @@ function generatePlaylist() {
 
 // generateDescription();
 // generateFinalJson();
-generatePlaylist();
+ generatePlaylist();
