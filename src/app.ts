@@ -16,7 +16,6 @@ import {
 } from "./util";
 import { load } from "cheerio";
 import { duration, Duration } from "moment";
-import startCase from "lodash.startcase";
 import { capitalize } from "lodash";
 
 type SupportedTimings = "Month" | "Week" | "Day";

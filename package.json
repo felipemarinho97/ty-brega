@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node app.ts",
-    "generate": "ts-node -e 'import { generateFinalJson } from \"./app\"; generateFinalJson()'",
-    "generate-playlist": "yarn run generate && ts-node -e 'import { generatePlaylistCli } from \"./app\";  generatePlaylistCli()'",
+    "start": "ts-node src/app.ts",
+    "generate": "ts-node -e 'import { generateFinalJson } from \"./src/app\"; generateFinalJson()'",
+    "generate-playlist": "yarn run generate && ts-node -e 'import { generatePlaylistCli } from \"./src/app\";  generatePlaylistCli()'",
     "pr": "prettier-init"
   },
   "license": "MIT",
