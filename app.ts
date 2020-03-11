@@ -1,5 +1,5 @@
 import Axios, { AxiosResponse } from "axios";
-import { writeFileSync, readFileSync } from "fs";
+import { writeFileSync, readFileSync, existsSync } from "fs";
 import { stringify } from "circular-json";
 import {
   getLast,
@@ -19,11 +19,13 @@ import { duration, Duration } from "moment";
 import startCase from "lodash.startcase";
 import { capitalize } from "lodash";
 
-const timing: "Month" | "Week" | "Day" = "Month";
-const amount: number = 1;
+type SupportedTimings = "Month" | "Week" | "Day";
+
+const TIMING: SupportedTimings = "Month";
+const AMOUNT: number = 1;
 
 const fileDate: string = new Date().toLocaleDateString();
-const pubAfter: string = getLast(timing, amount);
+const pubAfter: string = getLast(TIMING, AMOUNT);
 
 async function main(): Promise<gapi.client.youtube.SearchResult[]> {
   const videos: gapi.client.youtube.SearchResult[] = [];
@@ -77,18 +79,22 @@ async function main(): Promise<gapi.client.youtube.SearchResult[]> {
     .catch(console.log);
 
   writeFileSync(
-    `videos-${fileDate}-${amount}-${timing}.json`,
+    `videos-${fileDate}-${AMOUNT}-${TIMING}.json`,
     stringify(videos)
   );
   return videos;
 }
 
-function generateFinalJson() {
-  const videos: Promise<gapi.client.youtube.SearchResult[]> = main();
-
-  // const res: gapi.client.youtube.SearchResult[] = JSON.parse(
-  //   readFileSync(`videos-${fileDate}-${amount}-${timing}.json`).toString()
-  // );
+export function generateFinalJson() {
+  let videos: Promise<gapi.client.youtube.SearchResult[]>;
+  if (!existsSync(`videos-${fileDate}-${AMOUNT}-${TIMING}.json`))
+    videos = main();
+  else
+    videos = Promise.resolve(
+      JSON.parse(
+        readFileSync(`videos-${fileDate}-${AMOUNT}-${TIMING}.json`).toString()
+      )
+    );
 
   videos.then(res => {
     const finalVideos = [];
@@ -131,7 +137,7 @@ function generateFinalJson() {
           );
           console.log(sortedFinalVideos);
           writeFileSync(
-            `final-videos-${fileDate}-${amount}-${timing}.json`,
+            `final-videos-${fileDate}-${AMOUNT}-${TIMING}.json`,
             stringify(sortedFinalVideos)
           );
 
@@ -142,12 +148,16 @@ function generateFinalJson() {
   });
 }
 
-function generateDescription() {
+export function generateDescription() {
   const finalVideos = JSON.parse(
-    readFileSync(`final-videos-${fileDate}-${amount}-${timing}.json`).toString()
+    readFileSync(`final-videos-${fileDate}-${AMOUNT}-${TIMING}.json`).toString()
   );
 
   const iDur = duration("PT0M");
+
+  console.log(
+    `\n\n\r=> TRACKLIST of Best Bregas of last ${AMOUNT} ${TIMING}.\n\n`
+  );
 
   // iDur.subtract(duration("PT0M42S"));
   let i = 1;
@@ -175,9 +185,9 @@ function generateDescription() {
   }
 }
 
-function generatePlaylist() {
+export function generatePlaylist() {
   const finalVideos = JSON.parse(
-    readFileSync(`final-videos-${fileDate}-${amount}-${timing}.json`).toString()
+    readFileSync(`final-videos-${fileDate}-${AMOUNT}-${TIMING}.json`).toString()
   );
 
   const ids: string[] = finalVideos.map(
@@ -185,12 +195,7 @@ function generatePlaylist() {
   );
 
   console.log(
-    timing,
-    amount,
-    "https://www.youtube.com/watch_videos?video_ids=" + ids.join(",")
+    `\n\n\r=> Playlist link of the best Brega Funk for the last ${AMOUNT} ${TIMING}.\n\n`,
+    "\rhttps://www.youtube.com/watch_videos?video_ids=" + ids.join(",") + "\n\n"
   );
 }
-
-// generateDescription();
-// generateFinalJson();
- generatePlaylist();

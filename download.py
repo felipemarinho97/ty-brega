@@ -1,7 +1,9 @@
 import json
 import os
 
-file = open('./finalVideos.json')
+FILENAME = f"final-videos-YYYY-M-DD-N-TIMING.json"
+
+file = open(f'./{FILENAME}')
 
 data = json.loads(file.read())
 
