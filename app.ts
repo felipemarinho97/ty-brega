@@ -85,18 +85,24 @@ async function main(): Promise<gapi.client.youtube.SearchResult[]> {
   return videos;
 }
 
-export function generateFinalJson() {
+export function generateFinalJson(): Promise<void> {
+  if (existsSync(`final-videos-${fileDate}-${AMOUNT}-${TIMING}.json`)) {
+    return Promise.resolve();
+  }
+
   let videos: Promise<gapi.client.youtube.SearchResult[]>;
-  if (!existsSync(`videos-${fileDate}-${AMOUNT}-${TIMING}.json`))
+
+  if (!existsSync(`videos-${fileDate}-${AMOUNT}-${TIMING}.json`)) {
     videos = main();
-  else
+  } else {
     videos = Promise.resolve(
       JSON.parse(
         readFileSync(`videos-${fileDate}-${AMOUNT}-${TIMING}.json`).toString()
       )
     );
+  }
 
-  videos.then(res => {
+  return videos.then(res => {
     const finalVideos = [];
     for (let i = 0; i < res.length; i++) {
       const searchResult: gapi.client.youtube.SearchResult = res[i];
@@ -141,14 +147,15 @@ export function generateFinalJson() {
             stringify(sortedFinalVideos)
           );
 
-          generateDescription();
+          return Promise.resolve();
+          // generateDescription();
         }
       });
     }
   });
 }
 
-export function generateDescription() {
+export function generateDescription(): void {
   const finalVideos = JSON.parse(
     readFileSync(`final-videos-${fileDate}-${AMOUNT}-${TIMING}.json`).toString()
   );
@@ -185,7 +192,7 @@ export function generateDescription() {
   }
 }
 
-export function generatePlaylist() {
+export function generatePlaylist(): void {
   const finalVideos = JSON.parse(
     readFileSync(`final-videos-${fileDate}-${AMOUNT}-${TIMING}.json`).toString()
   );
@@ -198,4 +205,9 @@ export function generatePlaylist() {
     `\n\n\r=> Playlist link of the best Brega Funk for the last ${AMOUNT} ${TIMING}.\n\n`,
     "\rhttps://www.youtube.com/watch_videos?video_ids=" + ids.join(",") + "\n\n"
   );
+}
+
+export function generatePlaylistCli() {
+  generateDescription();
+  generatePlaylist();
 }
